@@ -1,67 +1,66 @@
-import React, { Component } from "react";
+import React, { useState, useContext } from "react";
+import { GlobalContext } from "../Context/GlobalProvider";
 import Details from "./Details";
 
-class Listings extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      detail: {
-        image: "url(../img/h3.jpeg)",
-        rooms: 4,
-        bathrooms: 3,
-        price: 280000,
-        floorSpace: 1600,
-      },
-    };
-    this.loop = this.loop.bind(this);
-  }
+function Listings() {
+  const { state, change } = useContext(GlobalContext);
 
-  loop() {
-    const { data } = this.props;
-
+  //default details page
+  const [details, setDetails] = useState({
+    detail: {
+      image: "url(../img/h3.jpeg)",
+      rooms: 4,
+      bathrooms: 3,
+      price: 280000,
+      floorSpace: 1600,
+    },
+  });
+  function loop() {
+    //loop through listings
+    const data = state.filteredData;
     if (data === undefined || data === 0) {
       return "Sorry your filter did not match any listings";
     }
 
-    return data.map((d, index) => {
+    return data.map((item, index) => {
       return (
         <div className='col-md-2' key={index}>
           <div className='listing' id='listing'>
             <div
               className='listing-img'
               style={{
-                backgroundImage: `${d.image}`,
+                backgroundImage: `${item.image}`,
                 backgroundSize: "cover",
               }}
             >
-              <span className='address'>{d.address}</span>
+              <span className='address'>{item.address}</span>
               <div className='details'>
                 <div className='col-md-3'>
                   <div className='user-img'></div>
                 </div>
                 <div className='col-md-9'>
                   <div className='user-details'>
-                    <span className='user-name'> {d.name}</span>
+                    <span className='user-name'> {item.name}</span>
                   </div>
                   <div className='listing-details'>
                     <div className='floor-space'>
                       {" "}
                       <i className='far fa-square' aria-hidden='true' />{" "}
-                      <span>{d.floorSpace} ft&sup2;</span>{" "}
+                      <span>{item.floorSpace} ft&sup2;</span>{" "}
                     </div>
                     <div className='bedrooms'>
                       <i className='fa fa-bed' aria-hidden='true' />
-                      <span>{d.rooms}</span>
+                      <span>{item.rooms}</span>
                     </div>
                     <div className='bathrooms'>
                       <i className='fa fa-bath' aria-hidden='true' />
-                      <span>{d.bathrooms}</span>
+                      <span>{item.bathrooms}</span>
                     </div>
                   </div>
                   <a
                     href='#popup'
                     className='view-btn'
-                    onClick={() => this.setState({ detail: d })}
+                    onClick={() => setDetails({ detail: item })}
                   >
                     View Property
                   </a>
@@ -69,10 +68,10 @@ class Listings extends Component {
               </div>
             </div>
             <div className='bottom-info'>
-              <span className='price'>${d.price}</span>
+              <span className='price'>${item.price}</span>
               <span className='location'>
                 <i className='fa fa-map-marker'></i>
-                {d.city}, {d.state}
+                {item.city}, {item.state}
               </span>
             </div>
           </div>
@@ -81,43 +80,33 @@ class Listings extends Component {
     });
   }
 
-  render() {
-    return (
-      <section id='listings'>
-        <section className='search-area'>
-          <input
-            type='text'
-            name='search'
-            onChange={this.props.change}
-            placeholder='Search'
-          />
-        </section>
-        <section className='sortby-area'>
-          <div className='results'>
-            {" "}
-            {this.props.globalState.filteredData.length} results found
-          </div>
-          <div className='sort-options'>
-            <select
-              name='sortby'
-              className='sortby'
-              onChange={this.props.change}
-            >
-              <option value='price-des'> Lowest Price</option>
-
-              <option value='price-asc'> Highest Price</option>
-            </select>
-            <a href='#filter' className='filter__toggle'>
-              Filter
-            </a>
-            <div className='view'></div>
-          </div>
-        </section>
-        <section className='listings-results'>{this.loop()}</section>
-        <Details state={this.state.detail} />
+  return (
+    <section id='listings'>
+      <section className='search-area'>
+        <input
+          type='text'
+          name='search'
+          onChange={change}
+          placeholder='Search'
+        />
       </section>
-    );
-  }
-}
+      <section className='sortby-area'>
+        <div className='results'>{state.filteredData.length} results found</div>
+        <div className='sort-options'>
+          <select name='sortby' className='sortby' onChange={change}>
+            <option value='price-des'> Lowest Price</option>
 
+            <option value='price-asc'> Highest Price</option>
+          </select>
+          <a href='#filter' className='filter__toggle'>
+            Filter
+          </a>
+          <div className='view'></div>
+        </div>
+      </section>
+      <section className='listings-results'>{loop()}</section>
+      <Details state={details.detail} />
+    </section>
+  );
+}
 export default Listings;
